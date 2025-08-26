@@ -24,10 +24,26 @@ where \(H\) is the Hamiltonian. Solving this numerically yields energy eigenvalu
 ## 🛠 Installation
 Clone the repository and install dependencies:
 
-```bash
+bash
 git clone https://github.com/Mezzirak/quantum-playground.git
 cd quantum_playground
-pip install -r requirements.txt '''
+pip install -r requirements.txt 
 
 
+🚀 Usage
 
+Run the solver
+
+python main.py
+
+Example: Harmonic Oscillator
+
+from solver import solve_schrodinger
+from potentials import harmonic_oscillator
+import visualization as viz
+
+x, energies, wavefuncs = solve_schrodinger(harmonic_oscillator)
+
+viz.plot_eigenstates(x, energies, wavefuncs, n_states=5)
+
+This will plot the first few eigenstates of the harmonic oscillator.
