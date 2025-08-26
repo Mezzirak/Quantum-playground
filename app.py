@@ -8,7 +8,7 @@ import io
 
 st.sidebar.title("Quantum Playground")
 
-# Select potential
+# Select the potential
 potential_type = st.sidebar.selectbox(
     "Choose potential",
     ["Harmonic Oscillator", "Particle in a Box", "Double Well", "Custom Expression", "Custom CSV"]
