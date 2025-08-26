@@ -18,7 +18,7 @@ potential_type = st.sidebar.selectbox(
 x = np.linspace(-10, 10, 1000)
 V = np.zeros_like(x)
 
-# --- Potential parameters ---
+# Potential parameters
 if potential_type == "Harmonic Oscillator":
     k = st.sidebar.slider("Spring constant k", 0.1, 5.0, 1.0)
     V = harmonic_oscillator(x, k)
@@ -50,10 +50,10 @@ elif potential_type == "Custom CSV":
             st.error(f"Error reading CSV: {e}")
             V = np.zeros_like(x)
 
-# --- Solve Schrödinger equation ---
+# Solve Schrödinger equation
 x, energies, wavefuncs = solve_schrodinger(V, x)
 
-# --- Plot ---
+# Plot
 st.title(f"{potential_type} Eigenstates")
 n_states = st.slider("Number of eigenstates to display", 1, 10, 5)
 
