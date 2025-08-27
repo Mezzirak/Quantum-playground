@@ -1,67 +1,76 @@
 import streamlit as st
 import numpy as np
-from solver import solve_schrodinger
-from potentials import harmonic_oscillator, particle_in_box, double_well
 import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d
-import io
 
+# Import your solvers and potentials
+from solver import solve_schrodinger
+from solver_2d import solve_schrodinger_2d
+from potentials import harmonic_oscillator_1d, particle_in_box_1d, double_well_1d
+from potentials import harmonic_oscillator_2d, particle_in_box_2d, double_well_2d
+
+# Streamlit sidebar for user input
 st.sidebar.title("Quantum Playground")
+dimension = st.sidebar.selectbox("Select dimension", ["1D", "2D"])
 
-# Select the potential
-potential_type = st.sidebar.selectbox(
-    "Choose potential",
-    ["Harmonic Oscillator", "Particle in a Box", "Double Well", "Custom Expression", "Custom CSV"]
-)
+# Select potential type
+if dimension == "1D":
+    potential_type = st.sidebar.selectbox("Select potential", ["Harmonic oscillator", "Particle in a box", "Double well"])
+elif dimension == "2D":
+    potential_type = st.sidebar.selectbox("Select potential", ["Harmonic oscillator", "Particle in a box", "Double well"])
 
-# Spatial grid
-x = np.linspace(-10, 10, 1000)
-V = np.zeros_like(x)
+# Number of eigenstates to compute
+num_states = st.sidebar.slider("Number of eigenstates", min_value=1, max_value=10, value=3)
 
-# Potential parameters
-if potential_type == "Harmonic Oscillator":
-    k = st.sidebar.slider("Spring constant k", 0.1, 5.0, 1.0)
-    V = harmonic_oscillator(x, k)
-elif potential_type == "Particle in a Box":
-    L = st.sidebar.slider("Box width L", 1.0, 20.0, 10.0)
-    V = particle_in_box(x, L)
-elif potential_type == "Double Well":
-    a = st.sidebar.slider("Well separation a", 1.0, 10.0, 5.0)
-    b = st.sidebar.slider("Barrier height b", 0.1, 2.0, 0.5)
-    V = double_well(x, a, b)
-elif potential_type == "Custom Expression":
-    st.sidebar.write("Enter a Python expression for V(x) using `x` and `np` (numpy).")
-    expr = st.sidebar.text_input("V(x) =", "0.5*x**2")
-    try:
-        V = eval(expr)
-    except Exception as e:
-        st.error(f"Error in custom potential: {e}")
-        V = np.zeros_like(x)
-elif potential_type == "Custom CSV":
-    uploaded_file = st.sidebar.file_uploader("Upload CSV (x, V(x))", type=["csv"])
-    if uploaded_file is not None:
-        try:
-            data = np.genfromtxt(io.StringIO(uploaded_file.getvalue().decode("utf-8")), delimiter=",", skip_header=0)
-            x_csv = data[:,0]
-            V_csv = data[:,1]
-            f = interp1d(x_csv, V_csv, kind='cubic', fill_value="extrapolate")
-            V = f(x)
-        except Exception as e:
-            st.error(f"Error reading CSV: {e}")
-            V = np.zeros_like(x)
+# Grid resolution
+grid_points = st.sidebar.slider("Grid points per dimension", min_value=50, max_value=200, value=100)
 
-# Solve Schrödinger equation
-x, energies, wavefuncs = solve_schrodinger(V, x)
+# Construct grid and potential
+if dimension == "1D":
+    x = np.linspace(-5, 5, grid_points)
+    if potential_type == "Harmonic oscillator":
+        potential = harmonic_oscillator_1d(x)
+    elif potential_type == "Particle in a box":
+        potential = particle_in_box_1d(x)
+    elif potential_type == "Double well":
+        potential = double_well_1d(x)
+elif dimension == "2D":
+    x = np.linspace(-5, 5, grid_points)
+    y = np.linspace(-5, 5, grid_points)
+    X, Y = np.meshgrid(x, y)
+    if potential_type == "Harmonic oscillator":
+        potential_2d = harmonic_oscillator_2d(X, Y)
+    elif potential_type == "Particle in a box":
+        potential_2d = particle_in_box_2d(X, Y)
+    elif potential_type == "Double well":
+        potential_2d = double_well_2d(X, Y)
 
-# Plot
-st.title(f"{potential_type} Eigenstates")
-n_states = st.slider("Number of eigenstates to display", 1, 10, 5)
+# Solve and plot
+if dimension == "1D":
+    energies, wavefuncs = solve_schrodinger(x, potential, num_states=num_states)
+    st.subheader("Eigenstates and Probability Densities (1D)")
 
-fig, ax = plt.subplots(figsize=(8,5))
-for i in range(n_states):
-    ax.plot(x, wavefuncs[:,i] + energies[i], label=f"n={i}")
-ax.set_xlabel("x")
-ax.set_ylabel("Energy + ψ(x)")
-ax.legend()
-st.pyplot(fig)
+    for i in range(num_states):
+        fig, ax = plt.subplots()
+        ax.plot(x, wavefuncs[:, i], label=f'ψ{i+1}(x)')
+        ax.plot(x, np.abs(wavefuncs[:, i])**2, label=f'|ψ{i+1}(x)|²')
+        ax.set_title(f'Eigenstate {i+1}, Energy = {energies[i]:.3f}')
+        ax.legend()
+        st.pyplot(fig)
+
+elif dimension == "2D":
+    energies, wavefuncs = solve_schrodinger_2d(x, y, potential_2d, num_states=num_states)
+    st.subheader("Eigenstates and Probability Densities (2D)")
+
+    for i in range(num_states):
+        fig, ax = plt.subplots()
+        c = ax.imshow(np.abs(wavefuncs[i])**2,
+                      extent=[x.min(), x.max(), y.min(), y.max()],
+                      origin='lower',
+                      cmap='viridis')
+        fig.colorbar(c, ax=ax, label='Probability density |ψ(x,y)|²')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title(f'Eigenstate {i+1}, Energy = {energies[i]:.3f}')
+        st.pyplot(fig)
+
 
