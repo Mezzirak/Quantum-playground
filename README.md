@@ -74,16 +74,14 @@ Run the application:
 
 **Project structure**
 
-Quantum-playground/
-│
-├─ app.py                  # Main Streamlit application
-├─ solver.py               # 1D Schrödinger equation solver
-├─ solver_2d.py            # 2D Schrödinger equation solver
-├─ potentials.py           # Definitions of 1D and 2D potentials
-├─ visualisation.py        # 1D plotting helper functions
-├─ venv/                   # Virtual environment
-├─ README.md               # This file
-└─ .gitignore              # Ignore __pycache__ and .pyc files
+- app.py                  # Main Streamlit application
+- solver.py               # 1D Schrödinger equation solver
+- solver_2d.py            # 2D Schrödinger equation solver
+- potentials.py           # Definitions of 1D and 2D potentials
+- visualisation.py        # 1D plotting helper functions
+- venv/                   # Virtual environment
+- README.md               # This file
+- .gitignore              # Ignore __pycache__ and .pyc files
 
 **Future Improvements**
 
