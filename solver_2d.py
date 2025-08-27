@@ -1,61 +1,45 @@
 import numpy as np
-from scipy.sparse import diags, kron, identity
+from scipy.sparse import diags, eye, kron
 from scipy.sparse.linalg import eigsh
 
-def construct_hamiltonian_2d(x, y, potential_2d):
+def solve_2d(V, x, y, n_eigen=3):
     """
-    Construct the 2D Hamiltonian matrix for a quantum system using
-    finite differences and sparse matrices.
+    Solve 2D stationary Schrödinger equation for a given potential.
+
+    Parameters
+    V : 2D array
+        Potential grid, shape (len(y), len(x))
+    x, y : 1D arrays
+        Spatial grids
+    n_eigen : int
+        Number of lowest eigenstates to compute
+
+    Returns
+    energies : ndarray
+        Eigenvalues (energies)
+    wavefunctions : list of 2D arrays
+        Eigenfunctions, each of shape (len(y), len(x))
     """
     Nx = len(x)
     Ny = len(y)
     dx = x[1] - x[0]
     dy = y[1] - y[0]
 
-    # 1D second derivative operators for x and y
-    diag_x = np.full(Nx, -2.0)
-    off_x = np.full(Nx - 1, 1.0)
-    D2x = diags([off_x, diag_x, off_x], offsets=[-1, 0, 1]) / (dx ** 2)
+    # Kinetic energy matrices (sparse)
+    Tx = diags([1, -2, 1], [-1, 0, 1], shape=(Nx, Nx)) / dx**2
+    Ty = diags([1, -2, 1], [-1, 0, 1], shape=(Ny, Ny)) / dy**2
 
-    diag_y = np.full(Ny, -2.0)
-    off_y = np.full(Ny - 1, 1.0)
-    D2y = diags([off_y, diag_y, off_y], offsets=[-1, 0, 1]) / (dy ** 2)
+    # 2D Laplacian using Kronecker products (sparse)
+    Lap = kron(eye(Ny), Tx) + kron(Ty, eye(Nx))
 
-    # 2D Laplacian using Kronecker products
-    Ix = identity(Nx)
-    Iy = identity(Ny)
-    Laplacian = kron(D2x, Iy) + kron(Ix, D2y)
+    # Flatten potential and make sparse diagonal
+    V_flat = V.flatten()
+    H = -0.5 * Lap + diags(V_flat)
 
-    # Flatten potential to match Hamiltonian
-    V_flat = potential_2d.flatten()
-    Potential = diags(V_flat, 0)
+    # Solve lowest n_eigen states
+    energies, wavefunctions_flat = eigsh(H, k=n_eigen, which='SA')
 
-    # Hamiltonian: H = -0.5 * Laplacian + V
-    H = -0.5 * Laplacian + Potential
+    # Reshape eigenvectors to 2D
+    wavefunctions = [wavefunctions_flat[:, i].reshape(Ny, Nx) for i in range(n_eigen)]
 
-    return H
-
-def solve_schrodinger_2d(x, y, potential_2d, num_states=5):
-    """
-    Solve the 2D time-independent Schrödinger equation.
-    Returns eigenvalues and eigenfunctions (reshaped to 2D grids).
-    """
-    H = construct_hamiltonian_2d(x, y, potential_2d)
-
-    # Sparse eigenvalue solver: lowest 'num_states' energies
-    energies, wavefuncs = eigsh(H, k=num_states, which="SM")
-
-    # Sort by energy
-    idx = np.argsort(energies)
-    energies = energies[idx]
-    wavefuncs = wavefuncs[:, idx]
-
-    # Reshape eigenvectors and normalise
-    wavefuncs_2d = []
-    for i in range(num_states):
-        psi = wavefuncs[:, i].reshape((len(x), len(y)))
-        norm = np.trapz(np.trapz(np.abs(psi)**2, y), x)
-        psi /= np.sqrt(norm)
-        wavefuncs_2d.append(psi)
-
-    return energies, wavefuncs_2d
+    return energies, wavefunctions

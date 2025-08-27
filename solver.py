@@ -1,47 +1,36 @@
 import numpy as np
-from scipy.sparse import diags
-from scipy.sparse.linalg import eigsh
+from scipy.linalg import eigh_tridiagonal
 
-def construct_hamiltonian(x, potential):
+def solve_1d(V, x, n_eigen=3):
     """
-    Construct the Hamiltonian matrix for a 1D quantum system using
-    finite differences and sparse storage.
+    Solve 1D stationary Schrödinger equation for a given potential.
+
+    Parameters
+    V : array_like
+        Potential array, same size as x
+    x : array_like
+        Spatial grid
+    n_eigen : int, optional
+        Number of lowest eigenstates to compute (default is 3)
+
+    Returns
+    energies : ndarray
+        Eigenvalues (energies)
+    wavefunctions : ndarray
+        Eigenfunctions, shape (n_eigen, len(x))
     """
     N = len(x)
     dx = x[1] - x[0]
 
-    # Kinetic energy operator (second derivative with central difference)
-    diagonal = np.full(N, -2.0)
-    off_diagonal = np.full(N - 1, 1.0)
-    laplacian = diags([off_diagonal, diagonal, off_diagonal], offsets=[-1, 0, 1]) / (dx ** 2)
+    # Kinetic energy using finite difference (tridiagonal)
+    diag = np.full(N, 1.0 / dx**2)
+    off_diag = np.full(N-1, -0.5 / dx**2)
 
-    # Potential energy operator (diagonal matrix)
-    potential_matrix = diags(potential, 0)
+    H_diag = diag + V  # Hamiltonian main diagonal
+    H_off_diag = off_diag
 
-    # Hamiltonian H = -0.5 * Laplacian + V(x)
-    H = -0.5 * laplacian + potential_matrix
-    return H
+    # Compute eigenvalues and eigenvectors
+    energies, wavefunctions = eigh_tridiagonal(H_diag, H_off_diag)
 
-def solve_schrodinger(x, potential, num_states=5):
-    """
-    Solve the time-independent Schrödinger equation in 1D using a sparse solver.
-    Returns eigenvalues (energies) and eigenvectors (wavefunctions).
-    """
-    H = construct_hamiltonian(x, potential)
-
-    # Use eigsh for sparse symmetric matrices (Hermitian)
-    energies, wavefuncs = eigsh(H, k=num_states, which="SM")  # "SM" = smallest magnitude eigenvalues
-
-    # Sort results by energy
-    idx = np.argsort(energies)
-    energies = energies[idx]
-    wavefuncs = wavefuncs[:, idx]
-
-    # Normalise wavefunctions
-    for i in range(num_states):
-        norm = np.trapz(np.abs(wavefuncs[:, i])**2, x)
-        wavefuncs[:, i] /= np.sqrt(norm)
-
-    return energies, wavefuncs
-
-
+    # Select the lowest n_eigen states
+    return energies[:n_eigen], wavefunctions[:, :n_eigen].T

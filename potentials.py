@@ -1,16 +1,27 @@
 import numpy as np
 
-def particle_in_box(x, L=10):
-    """Infinite potential well from -L/2 to L/2"""
+# 1D potentials
+def harmonic_oscillator_1d(x, omega=1.0):
+    return 0.5 * (omega * x)**2
+
+def particle_in_box_1d(x, L=10.0):
     V = np.zeros_like(x)
-    V[x < -L/2] = 1e10
-    V[x > L/2] = 1e10
+    V[x < -L/2] = 1e6
+    V[x > L/2] = 1e6
     return V
 
-def harmonic_oscillator(x, k=1.0):
-    """Harmonic oscillator potential: V = 0.5 * k * x^2"""
-    return 0.5 * k * x**2
+def double_well_1d(x, a=1.0, b=1.0):
+    return a * x**4 - b * x**2
 
-def double_well(x, a=5.0, b=0.5):
-    """Double well potential: V = b*(x^2 - a^2)^2"""
-    return b * (x**2 - a**2)**2
+# 2D potentials
+def harmonic_oscillator_2d(X, Y, omega_x=1.0, omega_y=1.0):
+    return 0.5 * (omega_x**2 * X**2 + omega_y**2 * Y**2)
+
+def particle_in_box_2d(X, Y, Lx=10.0, Ly=10.0):
+    V = np.zeros_like(X)
+    V[(X < -Lx/2) | (X > Lx/2) | (Y < -Ly/2) | (Y > Ly/2)] = 1e6
+    return V
+
+def double_well_2d(X, Y, a=1.0, b=1.0):
+    return a * (X**4 + Y**4) - b * (X**2 + Y**2)
+
