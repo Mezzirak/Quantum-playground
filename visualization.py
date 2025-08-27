@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 def plot_eigenstates(x, energies, wavefuncs, n_states=5):
     """
-    Plot first n_states eigenfunctions with corresponding energy levels
+    Plot first n_states eigenfunctions with corresponding energy levels.
     """
     plt.figure(figsize=(8,6))
     for i in range(n_states):
