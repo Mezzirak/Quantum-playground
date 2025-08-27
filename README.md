@@ -1,6 +1,6 @@
 ## 🌌 Quantum Playground
 
-Quantum Playground is an interactive Python application for exploring **quantum wavefunctions** and **eigenstates** in both **1D and 2D potentials**. Users can select the potential type, adjust parameters with sliders, and visualise eigenstates and probability densities. The 2D visualisations are fully interactive using **Plotly**, allowing rotation, zoom, and pan.
+Quantum Playground is an interactive Python application for exploring the stationary Schrödinger equation in one and two dimensions. It allows users to study quantum systems under a variety of potentials, including harmonic oscillators, infinite square wells, and double wells, as well as user-defined custom potentials.
 
 It allows you to **compute eigenvalues, eigenfunctions, and probability densities**, and visualise quantum systems interactively.
 
@@ -59,7 +59,7 @@ venv\Scripts\activate     # Windows ```</pre>
 
 If requirements.txt is not present, install directly:
 
-</pre>```python3 -m pip install streamlit numpy matplotlib plotly```</pre>
+</pre>```pip install streamlit numpy matplotlib plotly scipy```</pre>
 
 **Usage**
 
@@ -67,10 +67,10 @@ Run the application:
 
 </pre>```streamlit run app.py```</pre>
 
-- Use the sidebar to select dimension (1D or 2D) and potential type.
-- Adjust sliders to change potential parameters and number of eigenstates.
-- Visualisations update in real-time.
-- For 2D potentials, you can rotate, zoom, and pan the probability density surface.
+- Select 1D or 2D in the sidebar
+- Pick a predefined protential or use a custome potential
+- Adjust the number or eigenstates, grid points and potential parameters
+- Visualise eigenstates and probability densities interactively
 
 **Project structure**
 
@@ -81,13 +81,14 @@ Run the application:
 - visualisation.py        # 1D plotting helper functions
 - venv/                   # Virtual environment
 - README.md               # This file
+- requriements.txt        # Python dependencies
 - .gitignore              # Ignore __pycache__ and .pyc files
 
 **Future Improvements**
 
-- Allow custom potential functions to be uploaded.
+- Add more predefines potentials (e.g. Morse, finite wells)
 - Add eigenstate animations to see time evolution.
-- Add 2D wavefunction phase plots.
+- 
 - Improve solver performance for larger grids.
 
 
