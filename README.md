@@ -41,8 +41,9 @@ The **time-independent Schrödinger equation** is treated as a matrix eigenvalue
 ```
 The **time-dependent Schrödinger equation** is solved as an initial value problem using the Crank-Nicolson method to simulate dynamics:
 
+```math
 i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
-
+```
 **Installation**
 
 1. Clone the repository and install dependencies:
