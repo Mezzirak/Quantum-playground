@@ -36,14 +36,12 @@ The application is organised into two main modes, each with 1D and 2D capabiliti
 The project numerically solves the two fundamental forms of the Schrödinger equation.
 
 The **time-independent Schrödinger equation** is treated as a matrix eigenvalue problem to find stationary states:
-$$
-\left[ -\frac{\hbar^2}{2m}\frac{d^2}{dx^2} + V(x) \right] \psi(x) = E \psi(x)
-$$
+math```
+\left[ -\frac{\hbar^2}{2m}\frac{d^2}{dx^2} + V(x) \right] \psi(x) = E \psi(x)```math
 
 The **time-dependent Schrödinger equation** is solved as an initial value problem using the Crank-Nicolson method to simulate dynamics:
 $$
 i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
-$$
 
 **Installation**
 
