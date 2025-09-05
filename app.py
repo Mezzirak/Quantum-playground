@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.fft import fft, fftshift, fftfreq
 
-# --- Import all your solvers and potentials ---
+#Import all the solvers and potentials
 from solver import solve_1d
 from solver_tdse import solve_time_1d
 from solver_tdse_2d import solve_tdse_2d
@@ -17,7 +17,7 @@ from potentials import (
 plt.style.use('seaborn-v0_8-darkgrid')
 st.set_page_config(layout="wide")
 
-# --- Caching Functions ---
+#Caching Functions
 @st.cache_data
 def cached_solve_1d(potential_tuple, x_tuple, n_eigen):
     potential, x = np.array(potential_tuple), np.array(x_tuple)
@@ -33,13 +33,13 @@ def cached_solve_time_1d(potential_tuple, x_tuple, psi0_tuple, dt, n_steps):
 def cached_solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps):
     return solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps)
 
-# --- Sidebar UI ---
+#Sidebar UI
 st.sidebar.title("Quantum Playground")
 mode = st.sidebar.selectbox("Select mode", ["Stationary States", "Time Evolution"])
 st.sidebar.markdown("---")
 
 if mode == "Stationary States":
-    # --- STATIONARY STATES UI (No changes here) ---
+    #STATIONARY STATES UI
     st.sidebar.header("Stationary State Settings")
     dimension_stationary = st.sidebar.selectbox("Select dimension", ["1D"])
     st.header("1D Stationary Schrödinger Equation")
@@ -73,7 +73,7 @@ if mode == "Stationary States":
 
 
 elif mode == "Time Evolution":
-    # --- TIME EVOLUTION UI ---
+    #TIME EVOLUTION UI
     st.sidebar.header("Time Evolution Settings")
     dimension_tdse = st.sidebar.selectbox("Select dimension", ["1D", "2D"])
     st.sidebar.warning("Higher 'Grid points' or 'Time steps' will significantly increase calculation time, especially for 2D.")
@@ -99,7 +99,7 @@ elif mode == "Time Evolution":
                 p = fftshift(fftfreq(grid_points, x[1]-x[0]))*2*np.pi; phi_p = fftshift(fft(psi_t[i])); ax_momentum.plot(p, np.abs(phi_p)**2, color=colors[i], linewidth=2); ax_momentum.fill_between(p, np.abs(phi_p)**2, alpha=0.3, color=colors[i]); ax_momentum.set_title("Momentum Space"); ax_momentum.set_ylabel(r'$|\phi(p,t)|^2$'); ax_momentum.set_xlim(-20, 20);
                 fig.tight_layout(); plot_placeholder.pyplot(fig)
 
-            # --- NEW: SCATTERING ANALYSIS ---
+            #SCATTERING ANALYSIS
             if potential_type_tdse == "Potential Barrier (Tunneling)":
                 st.subheader("Scattering Analysis")
                 psi_final = psi_t[-1]
@@ -125,7 +125,7 @@ elif mode == "Time Evolution":
         else: st.info("Set 1D parameters and click 'Calculate and Animate' to begin.")
 
     elif dimension_tdse == "2D":
-        # ... (2D code remains the same) ...
+        #2D code
         st.sidebar.subheader("2D Settings"); grid_points_2d = st.sidebar.slider("Grid points per side", 20, 100, 50); time_steps_2d = st.sidebar.slider("Time steps", 20, 100, 40)
         st.sidebar.subheader("Initial 2D Wave Packet"); x0_2d = st.sidebar.slider("Initial x₀", -5.0, 5.0, -2.0); y0_2d = st.sidebar.slider("Initial y₀", -5.0, 5.0, 0.0); px0_2d = st.sidebar.slider("Initial momentum pₓ", -5.0, 5.0, 2.0); py0_2d = st.sidebar.slider("Initial momentum pᵧ", -5.0, 5.0, 1.0)
         if st.sidebar.button("Calculate and Animate 2D"):
