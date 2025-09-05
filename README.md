@@ -1,42 +1,49 @@
-## 🌌 Quantum Playground
+## Quantum Playground
 
 Quantum Playground is an interactive Python application for exploring the stationary Schrödinger equation in one and two dimensions. It allows users to study quantum systems under a variety of potentials, including harmonic oscillators, infinite square wells, and double wells, as well as user-defined custom potentials.
+
+This project was developed as a self-study tool based on Griffiths' "Introduction to Quantum Mechanics."
 
 It allows you to **compute eigenvalues, eigenfunctions, and probability densities**, and visualise quantum systems interactively.
 
 ## Features
 
-- **1D Potentials**
-  - Harmonic oscillator
-  - Particle in a box
-  - Double well
-    
-- **2D Potentials**
-  - Harmonic oscillator
-  - Particle in a box
-  - Double well
-    
-- **Interactive Sliders**
-  - Adjust physical parameters like `ω`, `L`, `a`, `b`, `ωx`, `ωy`, `Lx`, `Ly`
-    
-- **Solver**
-  - Computes eigenstates and energies using finite difference method
+The application is organised into two main modes, each with 1D and 2D capabilities:
 
-- **Visualisation**
-  - 1D: line plots of wavefunctions and probability densities
-  - 2D: interactive 3D surfaces of probability densities with Plotly
+### Stationary States
+- Solves the time-independent Schrödinger equation for bound states.
+- Calculates and visualises energy eigenvalues and eigenfunctions ($ψ_n(x)$).
+- Plots the probability densities ($|\psi_n(x)|^2$) for each state.
+- Includes a library of standard potentials:
+  - Infinite Square Well (Particle in a Box)
+  - Quantum Harmonic Oscillator
+  - Double Well Potential
+  - Finite Square Well
+
+### 🏃‍♂️ Time Evolution
+- Solves the time-dependent Schrödinger equation to simulate the dynamics of a wave packet.
+- Animates the probability density ($|\psi(x,y,t)|^2$) over time in 1D and 2D.
+- **Physics Visualised**:
+  - **Quantum Tunneling**: A wave packet scattering off a potential barrier.
+  - **Wave Packet Oscillation**: A particle moving in a 2D harmonic potential.
+  - **Momentum Space**: Simultaneously visualises the wave function's evolution in momentum space ($|\phi(p,t)|^2$).
+- **Scattering Analysis**:
+  - Automatically calculates the **Reflection (R)** and **Transmission (T)** coefficients after a 1D scattering simulation, providing a quantitative link to scattering theory.
+
 
 ## 📚 Background
-The time-independent Schrödinger equation:
 
--(ħ² / 2m) * d²ψ(x)/dx² + V(x) * ψ(x) = E * ψ(x)
+The project numerically solves the two fundamental forms of the Schrödinger equation.
 
-is discretized using finite differences and turned into a **matrix eigenvalue problem**:
+The **time-independent Schrödinger equation** is treated as a matrix eigenvalue problem to find stationary states:
+$$
+\left[ -\frac{\hbar^2}{2m}\frac{d^2}{dx^2} + V(x) \right] \psi(x) = E \psi(x)
+$$
 
-H ψ = E ψ
-where \(H\) is the Hamiltonian. Solving this numerically yields energy eigenvalues and eigenfunctions.
-
----
+The **time-dependent Schrödinger equation** is solved as an initial value problem using the Crank-Nicolson method to simulate dynamics:
+$$
+i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
+$$
 
 **Installation**
 
