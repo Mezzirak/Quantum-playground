@@ -11,24 +11,20 @@ It allows you to **compute eigenvalues, eigenfunctions, and probability densitie
 The application is organised into two main modes, each with 1D and 2D capabilities:
 
 ### Stationary States
-- Solves the time-independent Schrödinger equation for bound states.
-- Calculates and visualises energy eigenvalues and eigenfunctions ($ψ_n(x)$).
-- Plots the probability densities ($|\psi_n(x)|^2$) for each state.
-- Includes a library of standard potentials:
-  - Infinite Square Well (Particle in a Box)
-  - Quantum Harmonic Oscillator
-  - Double Well Potential
-  - Finite Square Well
+- Solves the time-independent Schrödinger equation for bound states in 1D and 2D.
+- **1D**: Calculates and visualises energy eigenvalues, eigenfunctions ($ψ_n(x)$), and probability densities ($|\psi_n(x)|^2$).
+- **2D**: Displays interactive 3D surface plots of the probability densities ($|\psi_n(x,y)|^2$) using Plotly.
+- **Analysis**: Includes a tool to numerically verify the orthogonality of eigenstates.
 
 ### 🏃‍♂️ Time Evolution
-- Solves the time-dependent Schrödinger equation to simulate the dynamics of a wave packet.
-- Animates the probability density ($|\psi(x,y,t)|^2$) over time in 1D and 2D.
+- Solves the time-dependent Schrödinger equation to simulate the dynamics of a wave packet in 1D and 2D.
 - **Physics Visualised**:
-  - **Quantum Tunneling**: A wave packet scattering off a potential barrier.
-  - **Wave Packet Oscillation**: A particle moving in a 2D harmonic potential.
+  - **Quantum Tunnelling**: A 1D wave packet scattering off a potential barrier.
   - **Momentum Space**: Simultaneously visualises the wave function's evolution in momentum space ($|\phi(p,t)|^2$).
-- **Scattering Analysis**:
-  - Automatically calculates the **Reflection (R)** and **Transmission (T)** coefficients after a 1D scattering simulation, providing a quantitative link to scattering theory.
+  - **Ehrenfest's Theorem**: Compares the quantum expectation value `<x>` to the trajectory of a classical particle, demonstrating the correspondence principle.
+- **Analysis Tools**:
+  - **Scattering Analysis**: Calculates the Reflection (R) and Transmission (T) coefficients from 1D scattering simulations.
+  - **GIF Export**: Allows the user to download 1D and 2D animations as GIF files for easy sharing.
 
 
 ## 📚 Background
@@ -44,6 +40,16 @@ The **time-dependent Schrödinger equation** is solved as an initial value probl
 ```math
 i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
 ```
+**Technology Stack**
+
+- Framework: Streamlit
+
+- Numerical Computation: NumPy & SciPy
+
+- Plotting: Matplotlib & Plotly
+
+- GIF Creation: imageio & Pillow
+
 **Installation**
 
 1. Clone the repository and install dependencies:
@@ -90,11 +96,6 @@ Run the application:
 - requriements.txt        # Python dependencies
 - .gitignore              # Ignore __pycache__ and .pyc files
 
-**Future Improvements**
 
-- Add more predefines potentials (e.g. Morse, finite wells)
-- Add eigenstate animations to see time evolution.
-- 
-- Improve solver performance for larger grids.
 
 
