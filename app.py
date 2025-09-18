@@ -43,6 +43,7 @@ def cached_solve_time_1d(potential_tuple, x_tuple, psi0_tuple, dt, n_steps):
 def cached_solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps):
     return solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps)
 
+# Helper function for expectation values and uncertainties
 def calculate_expectation_values(psi, x):
     """Calculates expectation values for position and momentum, and their uncertainties"""
     # Ensure wavefunction is normalised for this calculation
@@ -56,8 +57,8 @@ def calculate_expectation_values(psi, x):
     # Position squared expectation value <x^2>
     exp_x2 = np.sum(np.conj(psi_norm) * (x**2) * psi_norm).real * dx
     
-    # Momentum operator application using np.gradient for the derivative
-    # p_hat * psi = -i * hbar * d/dx(psi). We use hbar=1.
+    # Momentum operator application using np gradient for the derivative
+    # p_hat * psi = -i * hbar * d/dx(psi) We use hbar=1
     p_psi = -1j * np.gradient(psi_norm, dx)
     
     # Momentum expectation value <p>
@@ -93,7 +94,7 @@ def solve_classical(potential_func, x0, p0, t_span, t_eval):
 # Sidebar UI
 st.sidebar.title("Quantum Playground")
 mode = st.sidebar.selectbox("Select mode", ["Stationary States", "Time Evolution"])
-st.sidebar.markdown("---")
+st.sidebar.markdown("***")
 
 if mode == "Stationary States":
     st.sidebar.header("Stationary State Settings")
@@ -117,13 +118,13 @@ if mode == "Stationary States":
                 scaled_wavefunc = wavefuncs[i] / wavefunc_max; energy_spacing = (energies[1] - energies[0]) if num_states > 1 and len(energies) > 1 else 1
                 ax_main.plot(x, scaled_wavefunc * energy_spacing + energies[i], color=colours[i], linewidth=2.5, label=f'$E_{i+1}={energies[i]:.2f}$')
         ax_main.set_title("Eigenstates and Energies", fontsize=16); ax_main.set_xlabel("Position (x)", fontsize=12); ax_main.set_ylabel(r"Energy + $\psi(x)$", fontsize=12); ax_main.legend(); st.pyplot(fig_main)
-        st.markdown("---"); st.subheader("Probability Densities"); cols = st.columns(num_states)
+        st.markdown("***"); st.subheader("Probability Densities"); cols = st.columns(num_states)
         for i, col in enumerate(cols):
             with col:
                 fig_prob, ax_prob = plt.subplots(); prob_density = np.abs(wavefuncs[i])**2
                 ax_prob.plot(x, prob_density, color=colours[i], linewidth=2); ax_prob.fill_between(x, prob_density, alpha=0.3, color=colours[i])
                 ax_prob.set_title(f'State $n={i+1}$'); ax_prob.set_xlabel("x"); ax_prob.set_ylabel(r'$|\psi_{' + str(i+1) + r'}(x)|^2$'); ax_prob.set_yticks([]); st.pyplot(fig_prob)
-        st.markdown("---"); st.subheader("Check for Eigenstate Orthogonality")
+        st.markdown("***"); st.subheader("Check for Eigenstate Orthogonality")
         st.write("A fundamental property of stationary states is that they are orthogonal.")
         state_options = list(range(num_states)); col1, col2 = st.columns(2)
         with col1: n_state = st.selectbox("Select first state (n)", state_options, index=0)
@@ -179,7 +180,7 @@ elif mode == "Time Evolution":
                 else: potential = np.zeros_like(x); potential_func = lambda pos: 0.0
                 psi0 = (1 / (2 * np.pi * sigma0**2))**(1/4) * np.exp(-(x - x0)**2 / (4 * sigma0**2)) * np.exp(1j * p0 * x); psi0 /= np.sqrt(np.sum(np.abs(psi0)**2) * (x[1]-x[0]))
                 psi_t = cached_solve_time_1d(tuple(potential), tuple(x), tuple(psi0), dt=dt, n_steps=time_steps)
-            dx = x[1] - x[0]; exp_x = [np.sum(x * np.abs(psi)**2) * dx for psi in psi_t]; classical_x = solve_classical(potential_func, x0, p0, (0, dt*time_steps), time_array)
+            
             st.header("1D Time-Dependent Schrödinger Equation"); fig, (ax_main, ax_momentum) = plt.subplots(2, 1, figsize=(8, 8)); plot_placeholder = st.empty(); colours = cm.plasma(np.linspace(0, 1, time_steps))
             frames_1d = []
             for i in range(time_steps):
@@ -189,8 +190,55 @@ elif mode == "Time Evolution":
             with st.spinner("Creating GIF..."):
                 gif_buf = io.BytesIO(); imageio.mimsave(gif_buf, frames_1d, format='gif', duration=60);
                 st.download_button(label="Download Animation as GIF", data=gif_buf.getvalue(), file_name="animation_1d.gif", mime="image/gif")
+
+            # Calculate Expectation Values and Uncertainties over Time
+            exp_x_list, exp_p_list, delta_x_list, delta_p_list = [], [], [], []
+            for psi in psi_t:
+                exp_x, exp_p, delta_x, delta_p = calculate_expectation_values(psi, x)
+                exp_x_list.append(exp_x)
+                exp_p_list.append(exp_p)
+                delta_x_list.append(delta_x)
+                delta_p_list.append(delta_p)
+            
+            # The classical trajectory calculation remains the same
+            classical_x = solve_classical(potential_func, x0, p0, (0, dt*time_steps), time_array)
+
             if potential_type_tdse == "Potential Barrier (Tunnelling)": st.subheader("Scattering Analysis"); psi_final = psi_t[-1]; prob_density_final = np.abs(psi_final)**2; dx = x[1] - x[0]; reflected_mask = x < 0; transmitted_mask = x >= 0; R = np.sum(prob_density_final[reflected_mask]) * dx; T = np.sum(prob_density_final[transmitted_mask]) * dx; col1, col2, col3 = st.columns(3); col1.metric("Reflection Coefficient (R)", f"{R:.3f}"); col2.metric("Transmission Coefficient (T)", f"{T:.3f}"); col3.metric("Total Probability (R+T)", f"{R+T:.3f}");
-            st.subheader("Ehrenfest's Theorem: Quantum vs. Classical Motion"); fig_ehrenfest, ax_ehrenfest = plt.subplots(figsize=(8,4)); ax_ehrenfest.plot(time_array, classical_x, 'r--', linewidth=2.5, label='Classical Trajectory'); ax_ehrenfest.plot(time_array, exp_x, 'b-', linewidth=2, label='Quantum Expectation Value <x>'); ax_ehrenfest.set_xlabel("Time (t)"); ax_ehrenfest.set_ylabel("Position (x)"); ax_ehrenfest.set_title("Comparison of Quantum and Classical Paths"); ax_ehrenfest.legend(); st.pyplot(fig_ehrenfest)
+            
+            st.subheader("Ehrenfest's Theorem: Quantum vs Classical Motion")
+            fig_ehrenfest, ax_ehrenfest = plt.subplots(figsize=(8,4))
+            ax_ehrenfest.plot(time_array, classical_x, 'r--', linewidth=2.5, label='Classical Trajectory')
+            ax_ehrenfest.plot(time_array, exp_x_list, 'b-', linewidth=2, label='Quantum Expectation Value <x>')
+            ax_ehrenfest.set_xlabel("Time (t)")
+            ax_ehrenfest.set_ylabel("Position (x)")
+            ax_ehrenfest.set_title("Comparison of Quantum and Classical Paths")
+            ax_ehrenfest.legend()
+            st.pyplot(fig_ehrenfest)
+
+            st.subheader("Heisenberg's Uncertainty Principle")
+            st.markdown(r"A visual confirmation of $\Delta x \Delta p \geq \frac{\hbar}{2}$ Watch how the position uncertainty "
+                        r"($\Delta x$) grows for a free particle as the wave packet spreads")
+            fig_uncertainty, ax_uncertainty = plt.subplots(figsize=(8, 5))
+            
+            # Plot uncertainties
+            ax_uncertainty.plot(time_array, delta_x_list, color='crimson', linestyle='-', label=r'$\Delta x$ (Position Uncertainty)')
+            ax_uncertainty.plot(time_array, delta_p_list, color='mediumblue', linestyle='-', label=r'$\Delta p$ (Momentum Uncertainty)')
+            
+            # Plot the uncertainty product
+            uncertainty_product = np.array(delta_x_list) * np.array(delta_p_list)
+            ax_uncertainty.plot(time_array, uncertainty_product, 'k--', linewidth=2.5, label=r'$\Delta x \Delta p$ (Uncertainty Product)')
+            
+            # Plot the theoretical minimum (hbar/2), hbar is 1 in our units
+            ax_uncertainty.axhline(y=0.5, color='gray', linestyle=':', linewidth=2, label=r'Theoretical Minimum $\hbar/2 = 0.5$')
+            
+            ax_uncertainty.set_xlabel("Time (t)")
+            ax_uncertainty.set_ylabel("Value")
+            ax_uncertainty.set_title("Time Evolution of Uncertainties")
+            ax_uncertainty.legend(loc='best')
+            ax_uncertainty.grid(True, linestyle='--', alpha=0.6)
+            ax_uncertainty.set_ylim(bottom=0) # Uncertainty cannot be negative
+            st.pyplot(fig_uncertainty)
+
         else: st.info("Set 1D parameters and click 'Calculate and Animate' to begin.")
     elif dimension_tdse == "2D":
         st.sidebar.subheader("2D Settings"); grid_points_2d = st.sidebar.slider("Grid points per side", 20, 100, 50); time_steps_2d = st.sidebar.slider("Time steps", 20, 100, 40)
