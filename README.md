@@ -41,7 +41,7 @@ The **time-dependent Schrödinger equation** is solved as an initial value probl
 i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
 ```
 
-In quantum mechanics, physical observables are represented by operators. To find the expected value of an observable `$Q$` for a system in a state `$\Psi(x,t)$`, we calculate:
+In quantum mechanics, physical observables are represented by operators. To find the expected value of an observable $Q$ for a system in a state $\Psi(x,t)$, we calculate:
 
 $$
 \langle Q \rangle = \int \Psi^*(x,t) \hat{Q} \Psi(x,t) dx
