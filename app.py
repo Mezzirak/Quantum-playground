@@ -43,9 +43,44 @@ def cached_solve_time_1d(potential_tuple, x_tuple, psi0_tuple, dt, n_steps):
 def cached_solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps):
     return solve_tdse_2d(_potential, _x, _y, _psi0, dt, n_steps)
 
+def calculate_expectation_values(psi, x):
+    """Calculates expectation values for position and momentum, and their uncertainties"""
+    # Ensure wavefunction is normalised for this calculation
+    dx = x[1] - x[0]
+    norm = np.sqrt(np.sum(np.abs(psi)**2) * dx)
+    psi_norm = psi / norm
+
+    # Position expectation value <x>
+    exp_x = np.sum(np.conj(psi_norm) * x * psi_norm).real * dx
+    
+    # Position squared expectation value <x^2>
+    exp_x2 = np.sum(np.conj(psi_norm) * (x**2) * psi_norm).real * dx
+    
+    # Momentum operator application using np.gradient for the derivative
+    # p_hat * psi = -i * hbar * d/dx(psi). We use hbar=1.
+    p_psi = -1j * np.gradient(psi_norm, dx)
+    
+    # Momentum expectation value <p>
+    exp_p = np.sum(np.conj(psi_norm) * p_psi).real * dx
+
+    # Momentum squared expectation value <p^2>
+    # p_hat^2 * psi = (-i)^2 * d^2/dx^2(psi) = -1 * d/dx(p_psi / -i)
+    p2_psi = -1 * np.gradient(np.gradient(psi_norm, dx), dx)
+    exp_p2 = np.sum(np.conj(psi_norm) * p2_psi).real * dx
+    
+    # Calculate uncertainties (variances first)
+    var_x = exp_x2 - exp_x**2
+    var_p = exp_p2 - exp_p**2
+
+    # Avoid numerical issues with very small negative numbers
+    delta_x = np.sqrt(max(0, var_x))
+    delta_p = np.sqrt(max(0, var_p))
+    
+    return exp_x, exp_p, delta_x, delta_p
+
 #Solver for Ehrenfest Theorem
 def solve_classical(potential_func, x0, p0, t_span, t_eval):
-    """Solves Newton's equation of motion for a classical particle."""
+    """Solves Newton's equation of motion for a classical particle"""
     def classical_equations(t, y):
         x, p = y
         V_plus = potential_func(x + 1e-6); V_minus = potential_func(x - 1e-6)
