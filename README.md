@@ -47,12 +47,12 @@ $$
 \langle Q \rangle = \int \Psi^*(x,t) \hat{Q} \Psi(x,t) dx
 $$
 
-For position (`$x$`) and momentum (`$p$`), the operators in 1D are:
+For position ($x$) and momentum ($p$), the operators in 1D are:
 
-* **Position Operator (`$x$`):** $\hat{x} = x$
-* **Momentum Operator (`$p$`):** $\hat{p} = -i\hbar\frac{\partial}{\partial x}$
+* **Position Operator ($x$):** $\hat{x} = x$
+* **Momentum Operator ($p$):** $\hat{p} = -i\hbar\frac{\partial}{\partial x}$
 
-The uncertainty (`$\Delta Q$`) is the standard deviation, calculated as:
+The uncertainty ($\Delta Q$) is the standard deviation, calculated as:
 
 $$
 \Delta Q = \sqrt{\langle Q^2 \rangle - \langle Q \rangle^2}
