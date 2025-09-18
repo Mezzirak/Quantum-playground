@@ -41,19 +41,14 @@ The **time-dependent Schrödinger equation** is solved as an initial value probl
 i\hbar \frac{\partial}{\partial t}\Psi(x,t) = \left[ -\frac{\hbar^2}{2m}\frac{\partial^2}{\partial x^2} + V(x) \right] \Psi(x,t)
 ```
 
-In quantum mechanics, physical observables are represented by operators. To find the expected value of an observable `$Q$` for a system in a state `$\Psi(x,t)$`, we calculate:
-
+In quantum mechanics, physical observables are represented by operators. To find the expected value of an observable $Q$ for a system in a state $\Psi(x,t)$, we calculate:
 $$
-\langle Q \rangle = \int \Psi^*(x,t) \hat{Q} \Psi(x,t) dx
+\langle Q \rangle = \int \Psi^*(x,t) \hat{Q} \Psi(x,t) \, dx
 $$
-
-For position (`$x$`) and momentum (`$p$`), the operators in 1D are:
-
-* **Position Operator (`$x$`):** $\hat{x} = x$
-* **Momentum Operator (`$p$`):** $\hat{p} = -i\hbar\frac{\partial}{\partial x}$
-
-The uncertainty (`$\Delta Q$`) is the standard deviation, calculated as:
-
+For position ($x$) and momentum ($p$), the operators in 1D are:
+* **Position Operator ($x$):** $\hat{x} \{ f \} = x f$
+* **Momentum Operator ($p$):** $\hat{p} \{ f \} = -i \hbar \frac{\partial}{\partial x} f$
+The uncertainty ($\Delta Q$) is the standard deviation, calculated as:
 $$
 \Delta Q = \sqrt{\langle Q^2 \rangle - \langle Q \rangle^2}
 $$
